@@ -7,7 +7,7 @@
 ## Algrithms
   * double Cos(glm::vec3 vec_1, glm::vec3 vec_2) : 
       * Calculate cosine value of two vectors
-  * double Sos(glm::vec3 vec_1, glm::vec3 vec_2) : 
+  * double S(glm::vec3 vec_1, glm::vec3 vec_2) : 
       * Calculate sine value of two vectors
   * double Tan(glm::vec3 vec_1, glm::vec3 vec_2) : 
       * Calculate tangent value of two vectors
