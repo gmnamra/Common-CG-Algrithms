@@ -25,6 +25,8 @@ double Cos(glm::vec3 vec_1, glm::vec3 vec_2);
 double Sin(glm::vec3 vec_1, glm::vec3 vec_2);
 double Tan(glm::vec3 vec_1, glm::vec3 vec_2);
 
+glm::vec2 getVerticalUnitVec(glm::vec2 vec, bool is_left);
+
 double pointToLineDistance(glm::vec3 p, glm::vec3 l1, glm::vec3 l2);
 double pointToPlaneDistance(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 
@@ -33,11 +35,15 @@ glm::vec3 pointToLineProjection(glm::vec3 p, glm::vec3 l1, glm::vec3 l2);
 
 glm::vec3 lineToLineIntersection(glm::vec3 l1_1, glm::vec3 l1_2, glm::vec3 l2_1, glm::vec3 l2_2);
 glm::vec3 lineToPlaneIntersection(glm::vec3 l1, glm::vec3 l2, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
+glm::vec2 segToSegIntersection2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2);
 
 bool isPointOnLine(glm::vec3 p, glm::vec3 l1, glm::vec3 l2);
 bool isPointOnSegment(glm::vec3 p, glm::vec3 s1, glm::vec3 s2);
 bool isPointInPlane(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
+bool isPointInPolygon2D(glm::vec2 p, vector<glm::vec2> polygon);
+bool isSegmentInPolygon2D(glm::vec2 s1, glm::vec2 s2, vector<glm::vec2> polygon);
+bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2);
 
 
 //*************************** Cout Test **********************************
@@ -157,10 +163,10 @@ bool Delaunay(vector<glm::vec2> points, vector<glm::vec2> segments, bool is_loop
 		}
 		mean_length /= vPoints.size();
 
-		// ×îºóÒ»¸ö²ÎÊý±íÊ¾Ô¼Êø±ßÊÇ·ñ¿ÉÒÔ±»·Ö¸î£¬Í¨³£Éè¶¨Îªtrue
-		// µ«ÊÇÔÚ±¾³ÌÐòÖÐÓ¦¸ÃÉè¶¨Îªfalse
-		// ÒòÎªÔ¼Êø±ßÔÚÈý½Ç»¯Ö®Ç°ÊÇÑÏ¸ñ¶¨ÒåµÄ£¬²»¿É½øÐÐÐÞ¸Ä£¬
-		// ÒòÎªÒ»µ©ÐÞ¸ÄÔò»áµ¼ÖÂ±ß½çÉÏ³öÏÖ¶àÓàµÄµãÔòÔì³É·ÂÕæ³öÏÖ´íÎó
+		// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ö¸î£¬Í¨ï¿½ï¿½ï¿½è¶¨Îªtrue
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½è¶¨Îªfalse
+		// ï¿½ï¿½ÎªÔ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½Ö®Ç°ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½Þ¸Ä£ï¿½
+		// ï¿½ï¿½ÎªÒ»ï¿½ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½áµ¼ï¿½Â±ß½ï¿½ï¿½Ï³ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½É·ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½
 		dt.refine(pBoundedZone, 27, mean_length*3.0f, mean_length*1.5f, false);
 	}
 	else
@@ -184,7 +190,7 @@ bool Delaunay(vector<glm::vec2> points, vector<glm::vec2> segments, bool is_loop
 
 //*************************** Trigonometric ***********************************
 
-/* \brief Calculate cos¦Á
+/* \brief Calculate cosï¿½ï¿½
 *
 * Calculate cosine value of two vectors
 *
@@ -198,7 +204,8 @@ double Cos(glm::vec3 vec_1, glm::vec3 vec_2)
 	return (glm::dot(glm::normalize(vec_1), glm::normalize(vec_2)));
 }
 
-/* \brief Calculate sin¦Á
+
+/* \brief Calculate sinï¿½ï¿½
 *
 * Calculate sine value of two vectors
 *
@@ -212,7 +219,7 @@ double Sin(glm::vec3 vec_1, glm::vec3 vec_2)
 	return (sqrt(1.0f - pow(Cos(vec_1,vec_2),2)));
 }
 
-/* \brief Calculate tan¦Á
+/* \brief Calculate tanï¿½ï¿½
 *
 * Calculate tangent value of two vectors
 *
@@ -220,7 +227,7 @@ double Sin(glm::vec3 vec_1, glm::vec3 vec_2)
 * @param vec_2 is second vector
 *
 *	This method is to Calculate tangent value of two vectors
-*   Cos¦Á could not be zero
+*   Cosï¿½ï¿½ could not be zero
 */
 double Tan(glm::vec3 vec_1, glm::vec3 vec_2)
 {
@@ -231,6 +238,49 @@ double Tan(glm::vec3 vec_1, glm::vec3 vec_2)
 
 	return (sin / cos);
 }
+//*************************** Vector ***********************************
+
+/* \brief Vertical Unit Vector
+*
+* Get the Vertical Unit vector of a given vector
+*
+* @param vec is the given vector
+* @param is_left mean whether the output vector lie on the left 
+*		of the given vector
+*
+*	This method is to Get the Vertical Unit vector of a given vector
+*/
+glm::vec2 getVerticalUnitVec(glm::vec2 vec, bool is_left)
+{
+	glm::vec2 unit_vec;
+
+	unit_vec.x = vec.y / glm::length(vec);
+	unit_vec.y = vec.x / glm::length(vec);
+
+	if (is_left)
+	{
+		if (glm::cross(glm::vec3(vec, 0.0f), glm::vec3(unit_vec, 0.0f)).z > 0)
+		{
+			return unit_vec;
+		}
+		else
+		{
+			return (-1.0f * unit_vec);
+		}
+	}
+	else
+	{
+		if (glm::cross(glm::vec3(vec, 0.0f), glm::vec3(unit_vec, 0.0f)).z > 0)
+		{
+			return (-1.0f * unit_vec);
+		}
+		else
+		{
+			return unit_vec;
+		}
+	}
+}
+
 
 //*************************** Geometry ***********************************
 
@@ -348,6 +398,35 @@ glm::vec3 lineToLineIntersection(glm::vec3 l1_1, glm::vec3 l1_2, glm::vec3 l2_1,
 	return l1_1 + t1 * norm1;
 }
 
+/* \brief Segment & Segment interseciton point 2D
+*
+* Calculate the intersection point of Segment and Segment in 2D space
+*
+* @param s1_1,s1_2 are points of Segment1
+* @param s2_1,s2_2 are points of Segment2
+*
+* This method is to Calculate the intersection point of line and line in 3D space
+*
+*/
+glm::vec2 segToSegIntersection2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2)
+{
+	glm::vec3 l1_1 = glm::vec3(s1_1, 0.0f);
+	glm::vec3 l1_2 = glm::vec3(s1_2, 0.0f);
+	glm::vec3 l2_1 = glm::vec3(s2_1, 0.0f);
+	glm::vec3 l2_2 = glm::vec3(s2_2, 0.0f);
+
+	if (isSegmentIntersect2D(s1_1, s1_2, s2_1, s2_2))
+	{
+		glm::vec3 inter_point = lineToLineIntersection(l1_1, l1_2, l2_1, l2_2);
+		return glm::vec2(inter_point);
+	}
+	else
+	{
+		cerr << "ERROR : two segments are not intersect!!!" << endl;
+		return glm::vec2(0);
+	}
+}
+
 /* \brief Plane & Line interseciton point
 *
 * Calculate the intersection point of line and plane in 3D space
@@ -387,7 +466,7 @@ bool isPointOnLine(glm::vec3 p, glm::vec3 l1, glm::vec3 l2)
 	glm::vec3 line_vec = l2 - l1;
 	glm::vec3 point_vec = p - l1;
 
-//	return (glm::cross(line_vec, point_vec) == 0.0f);
+	return (glm::length(glm::cross(line_vec, point_vec)) == 0.0f);
 }
 
 /* \brief Point on Segment
@@ -398,11 +477,18 @@ bool isPointOnLine(glm::vec3 p, glm::vec3 l1, glm::vec3 l2)
 * @param l1,l2 are points on the segment
 *
 * This method is to Judge whether point on segment
+* Notice: end point is also belong to the segment
 *
 */
 bool isPointOnSegment(glm::vec3 p, glm::vec3 s1, glm::vec3 s2)
 {
+	if (p == s1 || p == s2) return true;
 
+	glm::vec3 line_vec = s2 - s1;
+	glm::vec3 point_vec1 = p - s1;
+	glm::vec3 point_vec2 = p - s2;
+
+	return (glm::length(glm::cross(line_vec, point_vec1)) == 0.0f && glm::dot(point_vec1,point_vec2) < 0.0f);
 }
 
 /* \brief Point in Plane
@@ -417,7 +503,11 @@ bool isPointOnSegment(glm::vec3 p, glm::vec3 s1, glm::vec3 s2)
 */
 bool isPointInPlane(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
+	glm::vec3 p_vec1 = p2 - p1;
+	glm::vec3 p_vec2 = p3 - p1;
+	glm::vec3 point_vec = p - p1;
 
+	return(glm::dot(glm::cross(p_vec1, p_vec2), point_vec) == 0.0f);
 }
 
 /* \brief Point in Triangle
@@ -432,5 +522,123 @@ bool isPointInPlane(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 */
 bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
+	glm::vec3 v0 = p3 - p1;
+	glm::vec3 v1 = p2 - p1;
+	glm::vec3 v2 = p - p1;
 
+	float dot00 = glm::dot(v0, v0);
+	float dot01 = glm::dot(v0, v1);
+	float dot02 = glm::dot(v0, v2);
+	float dot11 = glm::dot(v1, v1);
+	float dot12 = glm::dot(v1, v2);
+
+	float inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
+
+	float u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
+	float v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
+
+	if (u < 0 || u > 1) return false;
+	if (v < 0 || v > 1) return false;
+	if (u + v < 1)
+		return true;
+	else
+		return false;
+
+}
+
+/* \brief Point in Polygon
+*
+* Judge whether point in or out polygon
+*
+* @param p is point
+* @param polygon are point vector of polygon contour
+*
+* This method is to  Judge whether point in or out polygon
+* Draw a ray from the target point and see the number of 
+* intersections between the ray and all sides of the polygon.
+* If there are odd intersections, it means inside, and if 
+* there are even intersections, it means outside.
+*/
+bool isPointInPolygon2D(glm::vec2 p, vector<glm::vec2> polygon)
+{
+	float min_x = 1000;
+	for (int i = 0; i < polygon.size(); ++i)
+	{
+		if (polygon[i].x < min_x)
+		{
+			min_x = polygon[i].x;
+		}
+	}
+	glm::vec2 out_p = glm::vec2(min_x - 10.0f, p.y);
+
+	int cnt = 0;
+	for (int i = 0; i < polygon.size(); ++i)
+	{
+		glm::vec2 first = polygon[i];
+		glm::vec2 second = polygon[(i + 1) % polygon.size()];
+		if (isSegmentIntersect2D(p, out_p, first, second))
+		{
+			cnt++;
+		}
+	}
+	return (cnt % 2 == 1);
+}
+
+/* \brief Segment in Polygon
+*
+* Judge whether segment in or out polygon
+*
+* @param s1,s2 are endpoints of segment
+* @param polygon are point vector of polygon contour
+*
+* This method is to  Judge whether segment in or out polygon
+* First, determine whether the endpoint is inside the polygon
+* Then determine whether the line segment intersects with any side.
+*/
+bool isSegmentInPolygon2D(glm::vec2 s1, glm::vec2 s2, vector<glm::vec2> polygon)
+{
+	bool is_s1_in = isPointInPolygon2D(s1, polygon);
+	bool is_s2_in = isPointInPolygon2D(s2, polygon);
+	
+	if (is_s1_in && is_s2_in)
+	{
+		for (int i = 0; i < polygon.size(); ++i)
+		{
+			glm::vec2 first = polygon[i];
+			glm::vec2 second = polygon[(i + 1) % polygon.size()];
+			if (isSegmentIntersect2D(s1, s2, first, second))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/* \brief Two segments intersect
+*
+* Judge whether two segments intersect
+*
+* @param s1_1,s1_2 are endpoints of segment1
+* @param s2_1,s2_2 are endpoints of segment2
+*
+* This method is to  Judge whether two segments intersect
+*/
+bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2)
+{
+	glm::vec3 a = glm::vec3(s1_1, 0);
+	glm::vec3 b = glm::vec3(s1_2, 0);
+	glm::vec3 c = glm::vec3(s2_1, 0);
+	glm::vec3 d = glm::vec3(s2_2, 0);
+	glm::vec3 seg1 = b - a;
+	glm::vec3 seg2 = d - c;
+	 
+	float u = glm::dot(glm::cross(c - a, seg1), glm::cross(d - a, seg1));
+	float v = glm::dot(glm::cross(a - c, seg2), glm::cross(b - c, seg2));
+
+	return(u <= 0.00000001 && v <= 0.00000001);
 }
