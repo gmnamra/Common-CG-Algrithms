@@ -14,6 +14,9 @@
 #include <vector>
 #include <map>
 #include <stack>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 #include <assert.h>
 #include <glm.hpp>
 #include <Fade_2D.h>
@@ -21,7 +24,17 @@
 using namespace std;
 using namespace GEOM_FADE25D;
 
+/************************ Struct Data*********************************/
+struct Triangle
+{
+	int v0;
+	int v1;
+	int v2;
+};
+
 /********************** Declare All Functions Here ***********************/
+void readOBJ(vector<glm::vec2>& point_vec, vector<Triangle>& triangle_vec, string path);
+
 void Out(glm::vec2 vec_2);
 void Out(glm::vec3 vec_3);
 void Out(glm::vec4 vec_4);
@@ -54,6 +67,7 @@ bool isSegmentInPolygon2D(glm::vec2 s1, glm::vec2 s2, vector<glm::vec2> polygon)
 bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2);
 
 vector<glm::vec2> getConvexHull(vector<glm::vec2> points);
+vector<glm::vec2> getCoutourOfNonConvex2dMesh(string path);
 
 /********************** Declare All Functions Here ***********************/
 

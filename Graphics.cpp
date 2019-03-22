@@ -4,6 +4,62 @@ using namespace std;
 using namespace GEOM_FADE25D;
 
 
+
+//*************************** Read File *********************************
+/* \brief Read OBJ File
+*
+* Read points and triangles from obj file
+*
+* @param point_vec is vector of points
+* @param triangle_vec is vector of triangles
+* @param path is the path of obj file
+*
+*	This method is to read points and triangles from obj file
+*/
+void readOBJ(vector<glm::vec2>& point_vec, vector<Triangle>& triangle_vec, string path)
+{
+	ifstream infile(path);
+	float x, y, z;
+	char c;
+	string line;
+	while (!infile.eof())
+	{
+		getline(infile, line);
+		if (line == "")continue;
+		stringstream stringin(line);
+		stringin >> c >> x >> y >> z;
+		// judge points or triangles
+		if (c == 'v')
+		{
+			point_vec.push_back(glm::vec2(x, y));
+		}
+		if (c == 'f')
+		{
+			Triangle insert_triangle = { x,y,z };
+			triangle_vec.push_back(insert_triangle);
+		}
+	}
+	// Modify the initial index of triangles
+	int min_point_index = INT_MAX;
+	for (int i = 0; i < triangle_vec.size(); ++i)
+	{
+		min_point_index = min(min_point_index, triangle_vec[i].v0);
+		min_point_index = min(min_point_index, triangle_vec[i].v1);
+		min_point_index = min(min_point_index, triangle_vec[i].v2);
+	}
+	if (min_point_index != 0)
+	{
+		for (int i = 0; i < triangle_vec.size(); ++i)
+		{
+			triangle_vec[i].v0 -= min_point_index;
+			triangle_vec[i].v1 -= min_point_index;
+			triangle_vec[i].v2 -= min_point_index;
+		}
+	}
+	cout << "Read " << point_vec.size() << " points and " << triangle_vec.size() << " triangles from OBJ." << endl;
+}
+
+
 //*************************** Cout Test **********************************
 /*
 * Cout glm::vector in standard form: vec2,vec3,vec4
@@ -636,6 +692,10 @@ bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::v
 */
 vector<glm::vec2> getConvexHull(vector<glm::vec2> points)
 {
+	if (points.size() < 3)
+	{
+		cout << "Two few points,Can not find the convex !!!" << endl;
+	}
 	vector<glm::vec2> result;
 	// get the bottom point,min_y
 	int min_index = 0;
@@ -698,6 +758,110 @@ vector<glm::vec2> getConvexHull(vector<glm::vec2> points)
 		result_stack.pop();
 	}
 	std::reverse(result.begin(), result.end());
+
+	return result;
+}
+
+/* \brief Get Contour of Mesh
+*
+* get the contour of given non_convex mesh
+*
+* @param path are path of obj file
+* @return contour points of mesh
+*
+* Given a non_convex mesh, this method Automatic search
+* the contour of the mesh.
+*/
+vector<glm::vec2> getCoutourOfNonConvex2dMesh(string path)
+{
+	vector<glm::vec2> points_vec;
+	vector<Triangle> triangle_vec;
+	// read data from obj
+	readOBJ(points_vec, triangle_vec, path);
+
+	// get all single edges
+	vector<pair<int, int>> single_edge;
+	for (int i = 0; i < triangle_vec.size(); ++i)
+	{
+		int v0 = triangle_vec[i].v0;
+		int v1 = triangle_vec[i].v1;
+		int v2 = triangle_vec[i].v2;
+
+		std::vector<pair<int, int>>::iterator iter01 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v1));
+		std::vector<pair<int, int>>::iterator iter10 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v0));
+		if (iter01 != single_edge.end())
+		{
+			single_edge.erase(iter01);
+		}
+		else if(iter10 != single_edge.end())
+		{
+			single_edge.erase(iter10);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v1));
+		}
+
+		std::vector<pair<int, int>>::iterator iter02 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v2));
+		std::vector<pair<int, int>>::iterator iter20 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v0));
+		if (iter02 != single_edge.end())
+		{
+			single_edge.erase(iter02);
+		}
+		else if (iter20 != single_edge.end())
+		{
+			single_edge.erase(iter20);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v2));
+		}
+
+		std::vector<pair<int, int>>::iterator iter12 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v2));
+		std::vector<pair<int, int>>::iterator iter21 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v1));
+		if (iter12 != single_edge.end())
+		{
+			single_edge.erase(iter12);
+		}
+		else if (iter21 != single_edge.end())
+		{
+			single_edge.erase(iter21);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v1, v2));
+		}
+	}
+
+	// get contour points
+	vector<int> contour_index;
+	contour_index.push_back(single_edge[0].first);
+	contour_index.push_back(single_edge[0].second);
+	while (contour_index.size() < single_edge.size())
+	{
+		for (int i = 1; i < single_edge.size(); ++i)
+		{
+			if (single_edge[i].first == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].second) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].second);
+				}
+			}
+			else if (single_edge[i].second == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].first) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].first);
+				}
+			}
+		}
+	}
+	vector<glm::vec2> result;
+	for (int c : contour_index)
+	{
+		result.push_back(points_vec[c]);
+	}
 
 	return result;
 }
