@@ -12,6 +12,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
+#include <stack>
 #include <assert.h>
 #include <glm.hpp>
 #include <Fade_2D.h>
@@ -20,10 +22,16 @@ using namespace std;
 using namespace GEOM_FADE25D;
 
 /********************** Declare All Functions Here ***********************/
+void Out(glm::vec2 vec_2);
+void Out(glm::vec3 vec_3);
+void Out(glm::vec4 vec_4);
 
 double Cos(glm::vec3 vec_1, glm::vec3 vec_2);
+double Cos2d(glm::vec2 vec_1, glm::vec2 vec_2);
 double Sin(glm::vec3 vec_1, glm::vec3 vec_2);
+double Sin2d(glm::vec2 vec_1, glm::vec2 vec_2);
 double Tan(glm::vec3 vec_1, glm::vec3 vec_2);
+double Tan2d(glm::vec2 vec_1, glm::vec2 vec_2);
 
 glm::vec2 getVerticalUnitVec(glm::vec2 vec, bool is_left);
 
@@ -45,4 +53,7 @@ bool isPointInPolygon2D(glm::vec2 p, vector<glm::vec2> polygon);
 bool isSegmentInPolygon2D(glm::vec2 s1, glm::vec2 s2, vector<glm::vec2> polygon);
 bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2);
 
+vector<glm::vec2> getConvexHull(vector<glm::vec2> points);
+
 /********************** Declare All Functions Here ***********************/
+

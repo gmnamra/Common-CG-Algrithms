@@ -1,14 +1,4 @@
-// Copyright (C) Common Graphics Algorithms e.U, Fang Hao
-//
-// This file is implementation of Common Graphics Algorithms.
-//
-// Please contact the author if any conditions of this file are
-// not clear to you.
-//
-// Author: Fang Hao .Nanjing University ,VISG
-
 #include "Graphics.h"
-
 
 using namespace std;
 using namespace GEOM_FADE25D;
@@ -25,7 +15,7 @@ void Out(glm::vec2 vec_2)
 
 void Out(glm::vec3 vec_3)
 {
-	cout << "Vec3 -- X : " << vec_3.x << "  Y : " << vec_3.y << "  Z : " << vec_3.z  << endl;
+	cout << "Vec3 -- X : " << vec_3.x << "  Y : " << vec_3.y << "  Z : " << vec_3.z << endl;
 }
 
 void Out(glm::vec4 vec_4)
@@ -52,7 +42,7 @@ void Out(glm::vec4 vec_4)
 */
 
 bool Delaunay(vector<glm::vec2> points, vector<glm::vec2> segments, bool is_loop,
-	string name,double max_length = 0, double min_length = 0,string path = "defualt")
+	string name, double max_length = 0, double min_length = 0, string path = "defualt")
 {
 	// read the contour points
 	Fade_2D dt;
@@ -84,7 +74,7 @@ bool Delaunay(vector<glm::vec2> points, vector<glm::vec2> segments, bool is_loop
 	{
 		for (int i = 1; i < sPoints.size(); ++i)
 		{
-			Point2& p0(sPoints[i-1]);
+			Point2& p0(sPoints[i - 1]);
 			Point2& p1(sPoints[i]);
 			vSegments.push_back(Segment2(p0, p1));
 		}
@@ -131,10 +121,10 @@ bool Delaunay(vector<glm::vec2> points, vector<glm::vec2> segments, bool is_loop
 		}
 		mean_length /= vPoints.size();
 
-		// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ö¸î£¬Í¨ï¿½ï¿½ï¿½è¶¨Îªtrue
-		// ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½è¶¨Îªfalse
-		// ï¿½ï¿½ÎªÔ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½Ö®Ç°ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½Þ¸Ä£ï¿½
-		// ï¿½ï¿½ÎªÒ»ï¿½ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½áµ¼ï¿½Â±ß½ï¿½ï¿½Ï³ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½É·ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½
+		// ×îºóÒ»¸ö²ÎÊý±íÊ¾Ô¼Êø±ßÊÇ·ñ¿ÉÒÔ±»·Ö¸î£¬Í¨³£Éè¶¨Îªtrue
+		// µ«ÊÇÔÚ±¾³ÌÐòÖÐÓ¦¸ÃÉè¶¨Îªfalse
+		// ÒòÎªÔ¼Êø±ßÔÚÈý½Ç»¯Ö®Ç°ÊÇÑÏ¸ñ¶¨ÒåµÄ£¬²»¿É½øÐÐÐÞ¸Ä£¬
+		// ÒòÎªÒ»µ©ÐÞ¸ÄÔò»áµ¼ÖÂ±ß½çÉÏ³öÏÖ¶àÓàµÄµãÔòÔì³É·ÂÕæ³öÏÖ´íÎó
 		dt.refine(pBoundedZone, 27, mean_length*3.0f, mean_length*1.5f, false);
 	}
 	else
@@ -151,14 +141,14 @@ bool Delaunay(vector<glm::vec2> points, vector<glm::vec2> segments, bool is_loop
 	else
 	{
 		string _name = path + name + ".obj";
-		dt.writeObj(_name,pBoundedZone);
-	} 
+		dt.writeObj(_name, pBoundedZone);
+	}
 	return true;
 }
 
 //*************************** Trigonometric ***********************************
 
-/* \brief Calculate cosï¿½ï¿½
+/* \brief Calculate cos¦Á
 *
 * Calculate cosine value of two vectors
 *
@@ -172,8 +162,13 @@ double Cos(glm::vec3 vec_1, glm::vec3 vec_2)
 	return (glm::dot(glm::normalize(vec_1), glm::normalize(vec_2)));
 }
 
+double Cos2d(glm::vec2 vec_1, glm::vec2 vec_2)
+{
+	return (glm::dot(glm::normalize(vec_1), glm::normalize(vec_2)));
+}
 
-/* \brief Calculate sinï¿½ï¿½
+
+/* \brief Calculate sin¦Á
 *
 * Calculate sine value of two vectors
 *
@@ -184,10 +179,15 @@ double Cos(glm::vec3 vec_1, glm::vec3 vec_2)
 */
 double Sin(glm::vec3 vec_1, glm::vec3 vec_2)
 {
-	return (sqrt(1.0f - pow(Cos(vec_1,vec_2),2)));
+	return (sqrt(1.0f - pow(Cos(vec_1, vec_2), 2)));
 }
 
-/* \brief Calculate tanï¿½ï¿½
+double Sin2d(glm::vec2 vec_1, glm::vec2 vec_2)
+{
+	return (sqrt(1.0f - pow(Cos2d(vec_1, vec_2), 2)));
+}
+
+/* \brief Calculate tan¦Á
 *
 * Calculate tangent value of two vectors
 *
@@ -195,12 +195,22 @@ double Sin(glm::vec3 vec_1, glm::vec3 vec_2)
 * @param vec_2 is second vector
 *
 *	This method is to Calculate tangent value of two vectors
-*   Cosï¿½ï¿½ could not be zero
+*   Cos¦Á could not be zero
 */
 double Tan(glm::vec3 vec_1, glm::vec3 vec_2)
 {
 	double cos = Cos(vec_1, vec_2);
 	double sin = Sin(vec_1, vec_2);
+
+	assert(cos != 0);
+
+	return (sin / cos);
+}
+
+double Tan2d(glm::vec2 vec_1, glm::vec2 vec_2)
+{
+	double cos = Cos2d(vec_1, vec_2);
+	double sin = Sin2d(vec_1, vec_2);
 
 	assert(cos != 0);
 
@@ -213,7 +223,7 @@ double Tan(glm::vec3 vec_1, glm::vec3 vec_2)
 * Get the Vertical Unit vector of a given vector
 *
 * @param vec is the given vector
-* @param is_left mean whether the output vector lie on the left 
+* @param is_left mean whether the output vector lie on the left
 *		of the given vector
 *
 *	This method is to Get the Vertical Unit vector of a given vector
@@ -223,7 +233,7 @@ glm::vec2 getVerticalUnitVec(glm::vec2 vec, bool is_left)
 	glm::vec2 unit_vec;
 
 	unit_vec.x = vec.y / glm::length(vec);
-	unit_vec.y = vec.x / glm::length(vec);
+	unit_vec.y = -1 * vec.x / glm::length(vec);
 
 	if (is_left)
 	{
@@ -248,7 +258,6 @@ glm::vec2 getVerticalUnitVec(glm::vec2 vec, bool is_left)
 		}
 	}
 }
-
 
 //*************************** Geometry ***********************************
 
@@ -305,7 +314,7 @@ glm::vec3 pointToPlaneProjection(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::v
 {
 	glm::vec3 plane_vec1 = p2 - p1;
 	glm::vec3 plane_vec2 = p3 - p1;
-	glm::vec3 point_vec  = p - p1;
+	glm::vec3 point_vec = p - p1;
 	glm::vec3 unit_normal_vec = glm::normalize(glm::cross(plane_vec1, plane_vec2));
 
 	float dot = glm::dot(point_vec, unit_normal_vec);
@@ -403,7 +412,7 @@ glm::vec2 segToSegIntersection2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1,
 * @param l1,l2 are points on the line
 *
 * This method is to Calculate the intersection point of line and plane in 3D space
-*  
+*
 */
 glm::vec3 lineToPlaneIntersection(glm::vec3 l1, glm::vec3 l2, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
@@ -456,7 +465,7 @@ bool isPointOnSegment(glm::vec3 p, glm::vec3 s1, glm::vec3 s2)
 	glm::vec3 point_vec1 = p - s1;
 	glm::vec3 point_vec2 = p - s2;
 
-	return (glm::length(glm::cross(line_vec, point_vec1)) == 0.0f && glm::dot(point_vec1,point_vec2) < 0.0f);
+	return (glm::length(glm::cross(line_vec, point_vec1)) == 0.0f && glm::dot(point_vec1, point_vec2) < 0.0f);
 }
 
 /* \brief Point in Plane
@@ -522,9 +531,9 @@ bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 * @param polygon are point vector of polygon contour
 *
 * This method is to  Judge whether point in or out polygon
-* Draw a ray from the target point and see the number of 
+* Draw a ray from the target point and see the number of
 * intersections between the ray and all sides of the polygon.
-* If there are odd intersections, it means inside, and if 
+* If there are odd intersections, it means inside, and if
 * there are even intersections, it means outside.
 */
 bool isPointInPolygon2D(glm::vec2 p, vector<glm::vec2> polygon)
@@ -567,7 +576,7 @@ bool isSegmentInPolygon2D(glm::vec2 s1, glm::vec2 s2, vector<glm::vec2> polygon)
 {
 	bool is_s1_in = isPointInPolygon2D(s1, polygon);
 	bool is_s2_in = isPointInPolygon2D(s2, polygon);
-	
+
 	if (is_s1_in && is_s2_in)
 	{
 		for (int i = 0; i < polygon.size(); ++i)
@@ -604,9 +613,91 @@ bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::v
 	glm::vec3 d = glm::vec3(s2_2, 0);
 	glm::vec3 seg1 = b - a;
 	glm::vec3 seg2 = d - c;
-	 
+
 	float u = glm::dot(glm::cross(c - a, seg1), glm::cross(d - a, seg1));
 	float v = glm::dot(glm::cross(a - c, seg2), glm::cross(b - c, seg2));
 
 	return(u <= 0.00000001 && v <= 0.00000001);
+}
+
+/* \brief Get Convex Hull
+*
+* get the convex hull of some points
+*
+* @param points are some points of the plane
+* @return convex hull point vector of the points
+*
+* Convex hull is a concept in computational geometry (graphics)
+* Given a point set on a two-dimensional plane, a convex hull is
+* a convex polygon formed by connecting the outermost points. 
+* It can contain all points in the point set.
+* This method called Graham Scan.
+* Time complexity O(nlogn) 
+*/
+vector<glm::vec2> getConvexHull(vector<glm::vec2> points)
+{
+	vector<glm::vec2> result;
+	// get the bottom point,min_y
+	int min_index = 0;
+	float min_y = INT_MAX;
+	for (int i = 0; i < points.size(); ++i)
+	{
+		if (points[i].y < min_y)
+		{
+			min_y = points[i].y;
+			min_index = i;
+		}
+	}
+
+	// calculate cosin value of each point
+	map<float, int> point_cos_map;
+	for (int i = 0; i < points.size(); ++i)
+	{
+		if (i != min_index)
+		{
+			float cosin = Cos2d(points[i] - points[min_index], glm::vec2(1.0f, 0.0f));
+			// if cosin is in map,take the furthest point
+			if (point_cos_map.count(-cosin) != 0)
+			{
+				if (glm::length(points[i]) > glm::length(points[point_cos_map[-cosin]]))
+				{
+					point_cos_map[-cosin] = i;
+				}
+			}
+			else
+			{
+				point_cos_map[-cosin] = i;
+			}
+		}
+	}
+
+	// result stack
+	stack<int> result_stack;
+	// push bottom point and first min_cos point into stack
+	result_stack.push(min_index);
+	result_stack.push(point_cos_map.begin()->second);
+
+	for (map<float, int>::iterator iter = (++point_cos_map.begin()); iter != point_cos_map.end(); ++iter)
+	{
+		int first = result_stack.top();
+		result_stack.pop();
+		int second = result_stack.top();
+
+		glm::vec3 first_vec = glm::vec3(points[first] - points[second], 0.0f);
+		glm::vec3 second_vec = glm::vec3(points[iter->second] - points[first], 0.0f);
+		if (glm::cross(first_vec, second_vec).z >= 0)
+		{
+			result_stack.push(first);
+		}
+		result_stack.push(iter->second);
+	}
+	// read point from stack
+	while (!result_stack.empty())
+	{
+		result.push_back(points[result_stack.top()]);
+		result_stack.pop();
+	}
+	std::reverse(result.begin(), result.end());
+
+	return result;
 }
