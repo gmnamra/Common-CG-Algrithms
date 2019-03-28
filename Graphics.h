@@ -34,6 +34,7 @@ struct Triangle
 
 /********************** Declare All Functions Here ***********************/
 void readOBJ(vector<glm::vec2>& point_vec, vector<Triangle>& triangle_vec, string path);
+void writeOBJ(const vector<glm::vec2>& point_vec, const vector<Triangle>& triangle_vec, string path);
 
 void Out(glm::vec2 vec_2);
 void Out(glm::vec3 vec_3);

@@ -5,7 +5,7 @@ using namespace GEOM_FADE25D;
 
 
 
-//*************************** Read File *********************************
+//*************************** Read & Write File *********************************
 /* \brief Read OBJ File
 *
 * Read points and triangles from obj file
@@ -57,6 +57,44 @@ void readOBJ(vector<glm::vec2>& point_vec, vector<Triangle>& triangle_vec, strin
 		}
 	}
 	cout << "Read " << point_vec.size() << " points and " << triangle_vec.size() << " triangles from OBJ." << endl;
+}
+
+/* \brief Write OBJ File
+*
+* Write points and triangles into obj file
+*
+* @param point_vec is vector of points
+* @param triangle_vec is vector of triangles
+* @param path is the path of obj file
+*
+*	This method is to write points and triangles into obj file
+*/
+void writeOBJ(const vector<glm::vec2>& point_vec, const vector<Triangle>& triangle_vec, string path)
+{
+	ofstream fout;
+	fout.open(path);
+	for (int i = 0; i < point_vec.size(); ++i)
+	{
+		if (i != point_vec.size() - 1)
+		{
+			fout << 'v '<< point_vec[i].x << " " << point_vec[i].y << " " << 0.0 << endl;
+		}
+		else
+		{
+			fout << 'v ' <<  point_vec[i].x << " " << point_vec[i].y << " " << 0.0;
+		}
+	}
+	for (int i = 0; i < triangle_vec.size(); ++i)
+	{
+		if (i != triangle_vec.size() - 1)
+		{
+			fout << 'f ' << triangle_vec[i].v0 << " " << triangle_vec[i].v1 << " " << triangle_vec[i].v2 << endl;
+		}
+		else
+		{
+			fout << 'f ' << triangle_vec[i].v0 << " " << triangle_vec[i].v1 << " " << triangle_vec[i].v2;
+		}
+	}
 }
 
 
@@ -864,4 +902,296 @@ vector<glm::vec2> getCoutourOfNonConvex2dMesh(string path)
 	}
 
 	return result;
+}
+
+/* \brief Get Contour Index of Mesh
+*
+* get the contour index of given non_convex mesh
+*
+* @param path are path of obj file
+* @return contour points index of mesh
+*
+* Given a non_convex mesh, this method Automatic search
+* the contour of the mesh.
+*/
+vector<int> getCoutourIndexOfNonConvex2dMesh(string path)
+{
+	vector<glm::vec2> points_vec;
+	vector<Triangle> triangle_vec;
+	// read data from obj
+	readOBJ(points_vec, triangle_vec, path);
+
+	// get all single edges
+	vector<pair<int, int>> single_edge;
+	for (int i = 0; i < triangle_vec.size(); ++i)
+	{
+		int v0 = triangle_vec[i].v0;
+		int v1 = triangle_vec[i].v1;
+		int v2 = triangle_vec[i].v2;
+
+		std::vector<pair<int, int>>::iterator iter01 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v1));
+		std::vector<pair<int, int>>::iterator iter10 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v0));
+		if (iter01 != single_edge.end())
+		{
+			single_edge.erase(iter01);
+		}
+		else if (iter10 != single_edge.end())
+		{
+			single_edge.erase(iter10);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v1));
+		}
+
+		std::vector<pair<int, int>>::iterator iter02 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v2));
+		std::vector<pair<int, int>>::iterator iter20 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v0));
+		if (iter02 != single_edge.end())
+		{
+			single_edge.erase(iter02);
+		}
+		else if (iter20 != single_edge.end())
+		{
+			single_edge.erase(iter20);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v2));
+		}
+
+		std::vector<pair<int, int>>::iterator iter12 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v2));
+		std::vector<pair<int, int>>::iterator iter21 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v1));
+		if (iter12 != single_edge.end())
+		{
+			single_edge.erase(iter12);
+		}
+		else if (iter21 != single_edge.end())
+		{
+			single_edge.erase(iter21);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v1, v2));
+		}
+	}
+
+	// get contour points
+	vector<int> contour_index;
+	contour_index.push_back(single_edge[0].first);
+	contour_index.push_back(single_edge[0].second);
+	while (contour_index.size() < single_edge.size())
+	{
+		for (int i = 1; i < single_edge.size(); ++i)
+		{
+			if (single_edge[i].first == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].second) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].second);
+				}
+			}
+			else if (single_edge[i].second == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].first) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].first);
+				}
+			}
+		}
+	}
+	return contour_index;
+}
+
+/* \brief Get Contour of Mesh
+*
+* get the contour of given non_convex mesh
+*
+* @param point_vec are points of mesh
+* @param triangle_vec are triangles of mesh
+* @return contour points of mesh
+*
+* Given a non_convex mesh, this method Automatic search
+* the contour of the mesh.
+*/
+vector<glm::vec2> getCoutourOfNonConvex2dMesh(const vector<glm::vec2>& points_vec, const vector<Triangle>& triangle_vec)
+{
+	// get all single edges
+	vector<pair<int, int>> single_edge;
+	for (int i = 0; i < triangle_vec.size(); ++i)
+	{
+		int v0 = triangle_vec[i].v0;
+		int v1 = triangle_vec[i].v1;
+		int v2 = triangle_vec[i].v2;
+
+		std::vector<pair<int, int>>::iterator iter01 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v1));
+		std::vector<pair<int, int>>::iterator iter10 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v0));
+		if (iter01 != single_edge.end())
+		{
+			single_edge.erase(iter01);
+		}
+		else if (iter10 != single_edge.end())
+		{
+			single_edge.erase(iter10);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v1));
+		}
+
+		std::vector<pair<int, int>>::iterator iter02 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v2));
+		std::vector<pair<int, int>>::iterator iter20 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v0));
+		if (iter02 != single_edge.end())
+		{
+			single_edge.erase(iter02);
+		}
+		else if (iter20 != single_edge.end())
+		{
+			single_edge.erase(iter20);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v2));
+		}
+
+		std::vector<pair<int, int>>::iterator iter12 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v2));
+		std::vector<pair<int, int>>::iterator iter21 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v1));
+		if (iter12 != single_edge.end())
+		{
+			single_edge.erase(iter12);
+		}
+		else if (iter21 != single_edge.end())
+		{
+			single_edge.erase(iter21);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v1, v2));
+		}
+	}
+
+	// get contour points
+	vector<int> contour_index;
+	contour_index.push_back(single_edge[0].first);
+	contour_index.push_back(single_edge[0].second);
+	while (contour_index.size() < single_edge.size())
+	{
+		for (int i = 1; i < single_edge.size(); ++i)
+		{
+			if (single_edge[i].first == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].second) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].second);
+				}
+			}
+			else if (single_edge[i].second == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].first) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].first);
+				}
+			}
+		}
+	}
+	vector<glm::vec2> result;
+	for (int c : contour_index)
+	{
+		result.push_back(points_vec[c]);
+	}
+
+	return result;
+}
+
+/* \brief Get Contour Index of Mesh
+*
+* get the contour index of given non_convex mesh
+*
+* @param point_vec are points of mesh
+* @param triangle_vec are triangles of mesh
+* @return contour points index of mesh
+*
+* Given a non_convex mesh, this method Automatic search
+* the contour of the mesh.
+*/
+vector<int> getCoutourIndexOfNonConvex2dMesh(const vector<glm::vec2>& point_vec, const vector<Triangle>& triangle_vec)
+{
+	// get all single edges
+	vector<pair<int, int>> single_edge;
+	for (int i = 0; i < triangle_vec.size(); ++i)
+	{
+		int v0 = triangle_vec[i].v0;
+		int v1 = triangle_vec[i].v1;
+		int v2 = triangle_vec[i].v2;
+
+		std::vector<pair<int, int>>::iterator iter01 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v1));
+		std::vector<pair<int, int>>::iterator iter10 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v0));
+		if (iter01 != single_edge.end())
+		{
+			single_edge.erase(iter01);
+		}
+		else if (iter10 != single_edge.end())
+		{
+			single_edge.erase(iter10);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v1));
+		}
+
+		std::vector<pair<int, int>>::iterator iter02 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v0, v2));
+		std::vector<pair<int, int>>::iterator iter20 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v0));
+		if (iter02 != single_edge.end())
+		{
+			single_edge.erase(iter02);
+		}
+		else if (iter20 != single_edge.end())
+		{
+			single_edge.erase(iter20);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v0, v2));
+		}
+
+		std::vector<pair<int, int>>::iterator iter12 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v1, v2));
+		std::vector<pair<int, int>>::iterator iter21 = std::find(single_edge.begin(), single_edge.end(), pair<int, int>(v2, v1));
+		if (iter12 != single_edge.end())
+		{
+			single_edge.erase(iter12);
+		}
+		else if (iter21 != single_edge.end())
+		{
+			single_edge.erase(iter21);
+		}
+		else
+		{
+			single_edge.push_back(pair<int, int>(v1, v2));
+		}
+	}
+
+	// get contour points
+	vector<int> contour_index;
+	contour_index.push_back(single_edge[0].first);
+	contour_index.push_back(single_edge[0].second);
+	while (contour_index.size() < single_edge.size())
+	{
+		for (int i = 1; i < single_edge.size(); ++i)
+		{
+			if (single_edge[i].first == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].second) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].second);
+				}
+			}
+			else if (single_edge[i].second == contour_index.back())
+			{
+				if (std::find(contour_index.begin(), contour_index.end(), single_edge[i].first) == contour_index.end())
+				{
+					contour_index.push_back(single_edge[i].first);
+				}
+			}
+		}
+	}
+	return contour_index;
 }
