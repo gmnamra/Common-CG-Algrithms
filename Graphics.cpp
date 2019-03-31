@@ -310,6 +310,70 @@ double Tan2d(glm::vec2 vec_1, glm::vec2 vec_2)
 
 	return (sin / cos);
 }
+//*************************** Bezier **********************************
+
+/* \brief Linear Bezier Interpolation
+*
+* Linear Bezier Interpolation
+*
+* @param p1,p2 are given points
+* @param num are numbers of inter points
+*
+*	This method is to Linear Bezier Interpolation of given points
+*/
+vector<glm::vec2> oneBezierInterpolation(glm::vec2 p1, glm::vec2 p2, int num)
+{
+	vector<glm::vec2> result;
+	float step = float(1.0f) / (num + 1);
+	for (int i = 1; i <= num; ++i)
+	{
+		glm::vec2 point = (step * i) * p2 + (1.0f - step * i) * p1;
+		result.push_back(point);
+	}
+	return result;
+}
+
+/* \brief Square Bezier Interpolation
+*
+* Square Bezier Interpolation
+*
+* @param p1,p2,p3 are given points
+* @param num are numbers of inter points
+*
+*	This method is to Square Bezier Interpolation of given points
+*/
+vector<glm::vec2> twoBezierInterpolation(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, int num)
+{
+	vector<glm::vec2> result;
+	float step = float(1.0f) / (num + 1);
+	for (int i = 1; i <= num; ++i)
+	{
+		glm::vec2 point = ((step * i) * (step * i)) * p3 + (2 * (step * i) * (1 - step * i)) * p2 + ((1.0f - step * i) * (1.0f - step * i)) * p1;
+		result.push_back(point);
+	}
+	return result;
+}
+
+/* \brief Cube Bezier Interpolation
+*
+* Cube Bezier Interpolation
+*
+* @param p1,p2,p3,p4 are given points
+* @param num are numbers of inter points
+*
+*	This method is to Cube Bezier Interpolation of given points
+*/
+vector<glm::vec2> threeBezierInterpolation(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, int num)
+{
+	vector<glm::vec2> result;
+	float step = float(1.0f) / (num + 1);
+	for (int i = 1; i <= num; ++i)
+	{
+		glm::vec2 point = powf((step * i), 3) * p4 + 3 * powf((step * i), 2)*(1 - step * i) * p3 + 3 * powf((1 - step * i), 2)*(step * i) * p2 + powf((1 - step * i), 3) * p1;
+		result.push_back(point);
+	}
+	return result;
+}
 //*************************** Vector ***********************************
 
 /* \brief Vertical Unit Vector

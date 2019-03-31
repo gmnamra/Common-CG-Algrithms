@@ -47,6 +47,10 @@ double Sin2d(glm::vec2 vec_1, glm::vec2 vec_2);
 double Tan(glm::vec3 vec_1, glm::vec3 vec_2);
 double Tan2d(glm::vec2 vec_1, glm::vec2 vec_2);
 
+vector<glm::vec2> oneBezierInterpolation(glm::vec2 p1, glm::vec2 p2, int num);
+vector<glm::vec2> twoBezierInterpolation(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, int num);
+vector<glm::vec2> threeBezierInterpolation(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4, int num);
+
 glm::vec2 getVerticalUnitVec(glm::vec2 vec, bool is_left);
 
 double pointToLineDistance(glm::vec3 p, glm::vec3 l1, glm::vec3 l2);
