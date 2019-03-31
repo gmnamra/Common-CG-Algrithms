@@ -63,12 +63,16 @@ bool isPointOnLine(glm::vec3 p, glm::vec3 l1, glm::vec3 l2);
 bool isPointOnSegment(glm::vec3 p, glm::vec3 s1, glm::vec3 s2);
 bool isPointInPlane(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
+bool isPointByTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,float& u,float& v);
 bool isPointInPolygon2D(glm::vec2 p, vector<glm::vec2> polygon);
 bool isSegmentInPolygon2D(glm::vec2 s1, glm::vec2 s2, vector<glm::vec2> polygon);
 bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::vec2 s2_2);
 
 vector<glm::vec2> getConvexHull(vector<glm::vec2> points);
 vector<glm::vec2> getCoutourOfNonConvex2dMesh(string path);
+vector<int> getCoutourIndexOfNonConvex2dMesh(string path);
+vector<glm::vec2> getCoutourOfNonConvex2dMesh(const vector<glm::vec2>& point_vec, const vector<Triangle>& triangle_vec);
+vector<int> getCoutourIndexOfNonConvex2dMesh(const vector<glm::vec2>& point_vec, const vector<Triangle>& triangle_vec);
 
 /********************** Declare All Functions Here ***********************/
 

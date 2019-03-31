@@ -593,8 +593,8 @@ bool isPointInPlane(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 */
 bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
-	glm::vec3 v0 = p3 - p1;
-	glm::vec3 v1 = p2 - p1;
+	glm::vec3 v0 = p2 - p1;
+	glm::vec3 v1 = p3 - p1;
 	glm::vec3 v2 = p - p1;
 
 	float dot00 = glm::dot(v0, v0);
@@ -615,6 +615,61 @@ bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 	else
 		return false;
 
+}
+
+/* \brief Point by Triangle
+*
+* Judge whether point in Triangle,return u & v
+*
+* @param p is point
+* @param p1,p2,p3 are points on the Triangle
+* @param u,v are p represent by v12 and v13
+*
+* This method is to  Judge whether point in Triangle
+*
+*/
+bool isPointByTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,float& u,float& v)
+{
+	glm::vec3 v0 = p2 - p1;
+	glm::vec3 v1 = p3 - p1;
+	glm::vec3 v2 = p - p1;
+
+	float dot00 = glm::dot(v0, v0);
+	float dot01 = glm::dot(v0, v1);
+	float dot02 = glm::dot(v0, v2);
+	float dot11 = glm::dot(v1, v1);
+	float dot12 = glm::dot(v1, v2);
+
+	float inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
+
+	float _u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
+	float _v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
+
+	if (u < 0 || u > 1)
+	{
+		u = -1;
+		v = -1;
+		return false;
+	}
+	if (v < 0 || v > 1)
+	{
+
+		u = -1;
+		v = -1;
+		return false;
+	}
+	if (u + v <= 1)
+	{
+		u = _u;
+		v = _v;
+		return true;
+	}
+	else
+	{
+		u = -1;
+		v = -1;
+		return false;
+	}
 }
 
 /* \brief Point in Polygon
