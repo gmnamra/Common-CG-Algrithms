@@ -77,11 +77,11 @@ void writeOBJ(const vector<glm::vec2>& point_vec, const vector<Triangle>& triang
 	{
 		if (i != point_vec.size() - 1)
 		{
-			fout << 'v '<< point_vec[i].x << " " << point_vec[i].y << " " << 0.0 << endl;
+			fout << 'v ' << point_vec[i].x << " " << point_vec[i].y << " " << 0.0 << endl;
 		}
 		else
 		{
-			fout << 'v ' <<  point_vec[i].x << " " << point_vec[i].y << " " << 0.0;
+			fout << 'v ' << point_vec[i].x << " " << point_vec[i].y << " " << 0.0;
 		}
 	}
 	for (int i = 0; i < triangle_vec.size(); ++i)
@@ -325,11 +325,13 @@ vector<glm::vec2> oneBezierInterpolation(glm::vec2 p1, glm::vec2 p2, int num)
 {
 	vector<glm::vec2> result;
 	float step = float(1.0f) / (num + 1);
+	result.push_back(p1);
 	for (int i = 1; i <= num; ++i)
 	{
 		glm::vec2 point = (step * i) * p2 + (1.0f - step * i) * p1;
 		result.push_back(point);
 	}
+	result.push_back(p2);
 	return result;
 }
 
@@ -346,11 +348,13 @@ vector<glm::vec2> twoBezierInterpolation(glm::vec2 p1, glm::vec2 p2, glm::vec2 p
 {
 	vector<glm::vec2> result;
 	float step = float(1.0f) / (num + 1);
+	result.push_back(p1);
 	for (int i = 1; i <= num; ++i)
 	{
 		glm::vec2 point = ((step * i) * (step * i)) * p3 + (2 * (step * i) * (1 - step * i)) * p2 + ((1.0f - step * i) * (1.0f - step * i)) * p1;
 		result.push_back(point);
 	}
+	result.push_back(p3);
 	return result;
 }
 
@@ -367,11 +371,13 @@ vector<glm::vec2> threeBezierInterpolation(glm::vec2 p1, glm::vec2 p2, glm::vec2
 {
 	vector<glm::vec2> result;
 	float step = float(1.0f) / (num + 1);
+	result.push_back(p1);
 	for (int i = 1; i <= num; ++i)
 	{
 		glm::vec2 point = powf((step * i), 3) * p4 + 3 * powf((step * i), 2)*(1 - step * i) * p3 + 3 * powf((1 - step * i), 2)*(step * i) * p2 + powf((1 - step * i), 3) * p1;
 		result.push_back(point);
 	}
+	result.push_back(p4);
 	return result;
 }
 //*************************** Vector ***********************************
@@ -692,7 +698,7 @@ bool isPointInTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 * This method is to  Judge whether point in Triangle
 *
 */
-bool isPointByTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,float& u,float& v)
+bool isPointByTriangle(glm::vec3 p, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, float& u, float& v)
 {
 	glm::vec3 v0 = p2 - p1;
 	glm::vec3 v1 = p3 - p1;
@@ -842,10 +848,10 @@ bool isSegmentIntersect2D(glm::vec2 s1_1, glm::vec2 s1_2, glm::vec2 s2_1, glm::v
 *
 * Convex hull is a concept in computational geometry (graphics)
 * Given a point set on a two-dimensional plane, a convex hull is
-* a convex polygon formed by connecting the outermost points. 
+* a convex polygon formed by connecting the outermost points.
 * It can contain all points in the point set.
 * This method called Graham Scan.
-* Time complexity O(nlogn) 
+* Time complexity O(nlogn)
 */
 vector<glm::vec2> getConvexHull(vector<glm::vec2> points)
 {
@@ -950,7 +956,7 @@ vector<glm::vec2> getCoutourOfNonConvex2dMesh(string path)
 		{
 			single_edge.erase(iter01);
 		}
-		else if(iter10 != single_edge.end())
+		else if (iter10 != single_edge.end())
 		{
 			single_edge.erase(iter10);
 		}
